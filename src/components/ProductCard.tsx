@@ -16,6 +16,8 @@ const categoryEmojis: Record<string, string> = {
     'Electronics': '📱',
     'Clothing': '👕',
     'Books': '📚',
+    'Home & Garden': '🏡',
+    'Sports': '⚽',
     'default': '🛍️',
 };
 
