@@ -8,7 +8,7 @@ export default function NotFound() {
         Page Not Found
       </h1>
       <p className="text-sm mb-8" style={{ color: "#8e96b5" }}>
-        The page you're looking for doesn't exist.
+        The page you&apos;re looking for doesn&apos;t exist.
       </p>
       <Link href="/">
         <button
