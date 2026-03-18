@@ -6,7 +6,6 @@ import {
   selectCartSubtotal, selectCartDiscount, selectCartTotal,
   selectCouponCode, selectCouponDiscount, applyCoupon, removeCoupon,
 } from "@/store/slices/cartSlice";
-import { GoldBtn } from "@/components/ui/Buttons";
 
 export default function OrderSummary({ mode, onCheckout }: { mode:"cart"|"checkout"; onCheckout?:()=>void }) {
   const dispatch       = useAppDispatch();
@@ -15,91 +14,97 @@ export default function OrderSummary({ mode, onCheckout }: { mode:"cart"|"checko
   const couponCode     = useAppSelector(selectCouponCode);
   const couponDiscount = useAppSelector(selectCouponDiscount);
   const total          = useAppSelector(selectCartTotal);
-  const couponSaving   = Math.round((subtotal * couponDiscount) / 100);
-  const tax            = Math.round((subtotal - couponSaving) * 0.18);
+  const couponSaving   = Math.round((subtotal*couponDiscount)/100);
+  const tax            = Math.round((subtotal-couponSaving)*0.18);
+  const [input, setInput] = useState("");
+  const [err,   setErr]   = useState("");
 
-  const [couponInput, setCouponInput] = useState("");
-  const [couponError, setCouponError] = useState("");
-
-  function handleApplyCoupon() {
-    if (!couponInput.trim()) return;
-    const valid = ["LUXE20","SAVE10","FIRST15"];
-    if (valid.includes(couponInput.toUpperCase().trim())) {
-      dispatch(applyCoupon(couponInput));
-      setCouponError("");
-      setCouponInput("");
-    } else {
-      setCouponError("Invalid coupon code");
-    }
+  function handleApply() {
+    if (!input.trim()) return;
+    if (["LUXE20","SAVE10","FIRST15"].includes(input.toUpperCase().trim())) {
+      dispatch(applyCoupon(input)); setErr(""); setInput("");
+    } else { setErr("Invalid coupon code"); }
   }
 
+  const rows = [
+    { label:"Subtotal",         val:`₹${subtotal.toLocaleString()}`,       color:undefined   },
+    { label:"Product Discount", val:`−₹${discount.toLocaleString()}`,      color:"#10b981"   },
+    ...(couponDiscount>0 ? [{ label:`Coupon (${couponCode}) ${couponDiscount}%`, val:`−₹${couponSaving.toLocaleString()}`, color:"#10b981" }] : []),
+    { label:"Delivery",         val:"FREE",                                 color:"#10b981"   },
+    { label:"Tax (18% GST)",    val:`₹${tax.toLocaleString()}`,             color:undefined   },
+  ];
+
   return (
-    <div className="rounded-2xl border border-[#1e2232] bg-[#13161f] p-6 sticky top-20">
-      <h2 className="font-playfair text-xl font-bold mb-5" style={{ color:"#eef0f6" }}>Order Summary</h2>
+    <div className="rounded-xl border border-[#e2e8f0] bg-white shadow-sm p-6 sticky top-20">
+      <h2 className="font-poppins text-lg font-bold text-[#0f172a] mb-5">Order Summary</h2>
 
       <div className="flex flex-col gap-3 mb-4">
-        {[
-          { label:"Subtotal",          val:`₹${subtotal.toLocaleString()}`,            color:undefined },
-          { label:"Product Discount",  val:`−₹${discount.toLocaleString()}`,           color:"#34d399" },
-          ...(couponDiscount > 0 ? [{ label:`Coupon (${couponCode}) ${couponDiscount}%`, val:`−₹${couponSaving.toLocaleString()}`, color:"#34d399" }] : []),
-          { label:"Delivery",          val:"FREE",                                     color:"#34d399" },
-          { label:"Tax (18% GST)",     val:`₹${tax.toLocaleString()}`,                 color:undefined },
-        ].map((row) => (
-          <div key={row.label} className="flex justify-between text-sm" style={{ color:"#8e96b5" }}>
-            <span>{row.label}</span>
-            <span style={row.color ? { color:row.color } : undefined}>{row.val}</span>
+        {rows.map((r)=>(
+          <div key={r.label} className="flex justify-between text-sm text-[#64748b]">
+            <span>{r.label}</span>
+            <span style={r.color?{color:r.color}:undefined}>{r.val}</span>
           </div>
         ))}
       </div>
 
-      <div className="flex justify-between items-baseline pt-4 border-t border-[#1e2232] mb-5">
-        <span className="text-[17px] font-bold" style={{ color:"#eef0f6" }}>Total</span>
-        <span className="font-playfair text-[22px] font-bold" style={{ color:"#e8c97a" }}>₹{total.toLocaleString()}</span>
+      <div className="flex justify-between items-baseline pt-4 border-t border-[#e2e8f0] mb-5">
+        <span className="text-base font-bold text-[#0f172a]">Total</span>
+        <span className="font-poppins text-2xl font-black text-[#6366f1]">₹{total.toLocaleString()}</span>
       </div>
 
-      {mode === "cart" && (
+      {/* Coupon */}
+      {mode==="cart" && (
         <div className="mb-5">
           {couponCode ? (
-            <div className="flex items-center justify-between px-4 py-3 rounded-xl border text-sm font-semibold"
-              style={{ background:"rgba(52,211,153,0.08)", borderColor:"rgba(52,211,153,0.3)", color:"#34d399" }}>
-              <span>✓ {couponCode} applied · {couponDiscount}% off</span>
-              <button onClick={() => dispatch(removeCoupon())}
-                className="text-xs underline opacity-70 hover:opacity-100">Remove</button>
+            <div className="flex items-center justify-between px-3 py-2.5 rounded-lg border border-[#86efac] bg-[#f0fdf4] text-sm font-semibold text-[#10b981]">
+              <span>✓ {couponCode} · {couponDiscount}% off</span>
+              <button onClick={()=>dispatch(removeCoupon())} className="text-xs underline opacity-70 hover:opacity-100">Remove</button>
             </div>
           ) : (
             <>
               <div className="flex gap-2">
-                <input value={couponInput}
-                  onChange={(e) => { setCouponInput(e.target.value); setCouponError(""); }}
-                  onKeyDown={(e) => e.key === "Enter" && handleApplyCoupon()}
+                <input value={input} onChange={(e)=>{ setInput(e.target.value); setErr(""); }}
+                  onKeyDown={(e)=>e.key==="Enter"&&handleApply()}
                   placeholder="Coupon code (try LUXE20)"
-                  className="flex-1 px-4 py-2.5 rounded-[9px] border bg-[#0f1117] text-sm outline-none transition-colors focus:border-[#c9a84c]"
-                  style={{ borderColor:couponError?"#f87171":"#252b3d", color:"#eef0f6", fontFamily:"inherit" }}/>
-                <button onClick={handleApplyCoupon}
-                  className="px-4 py-2.5 rounded-[9px] text-sm font-bold coupon-apply-btn"
-                  style={{ background:"#c9a84c", color:"#080a0e", fontFamily:"inherit" }}>
-                  Apply
-                  <style>{`.coupon-apply-btn:hover{background:#e8c97a}`}</style>
-                </button>
+                  className="flex-1 px-3 py-2.5 rounded-lg border border-[#e2e8f0] bg-[#f8fafc] text-sm outline-none focus:border-[#6366f1] transition-colors"
+                  style={{ color:"#1e293b", fontFamily:"inherit", borderColor:err?"#ef4444":"#e2e8f0" }}/>
+                <button onClick={handleApply}
+                  className="px-4 py-2.5 rounded-lg text-sm font-bold bg-[#6366f1] hover:bg-[#4f46e5] text-white transition-all"
+                  style={{ fontFamily:"inherit" }}>Apply</button>
               </div>
-              {couponError && <p className="text-xs mt-1.5" style={{ color:"#f87171" }}>{couponError}</p>}
+              {err && <p className="text-xs mt-1.5 text-[#ef4444]">{err}</p>}
+              <p className="text-[10px] text-[#94a3b8] mt-2">Try: LUXE20 · SAVE10 · FIRST15</p>
             </>
           )}
         </div>
       )}
 
-      {mode === "cart" ? (
+      {/* CTA */}
+      {mode==="cart" ? (
         <Link href="/checkout">
-          <GoldBtn fullWidth>🔒 Proceed to Checkout</GoldBtn>
+          <button className="w-full py-3.5 rounded-xl text-sm font-bold text-white bg-[#6366f1] hover:bg-[#4f46e5] transition-all shadow-sm hover:shadow-md flex items-center justify-center gap-2"
+            style={{ fontFamily:"inherit" }}>
+            <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+              <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+            </svg>
+            Proceed to Checkout
+          </button>
         </Link>
       ) : (
-        <GoldBtn fullWidth onClick={onCheckout}>🔒 Place Order</GoldBtn>
+        <button onClick={onCheckout}
+          className="w-full py-3.5 rounded-xl text-sm font-bold text-white bg-[#6366f1] hover:bg-[#4f46e5] transition-all shadow-sm hover:shadow-md flex items-center justify-center gap-2"
+          style={{ fontFamily:"inherit" }}>
+          <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+            <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+          </svg>
+          Place Order
+        </button>
       )}
 
       <div className="flex justify-center gap-5 mt-4">
-        {[{ icon:"🔒", label:"SSL Secured" }, { icon:"↩️", label:"Easy Returns" }, { icon:"🚚", label:"Fast Ship" }].map((b) => (
-          <div key={b.label} className="flex items-center gap-1 text-[11px]" style={{ color:"#6b7290" }}>
-            <span>{b.icon}</span> {b.label}
+        {[{icon:"🔒",label:"SSL Secured"},{icon:"↩️",label:"Easy Returns"},{icon:"🚚",label:"Fast Ship"}].map((b)=>(
+          <div key={b.label} className="flex items-center gap-1 text-[10px] text-[#94a3b8]">
+            <span>{b.icon}</span>{b.label}
           </div>
         ))}
       </div>

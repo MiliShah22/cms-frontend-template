@@ -3,9 +3,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { clearCart, selectCartItems } from "@/store/slices/cartSlice";
-import { GoldBtn } from "@/components/ui/Buttons";
 
-const PAY_METHODS = [
+const PAY = [
   { id:"card",       label:"Card",        icon:"💳" },
   { id:"upi",        label:"UPI",         icon:"📲" },
   { id:"netbanking", label:"Net Banking", icon:"🏦" },
@@ -17,9 +16,9 @@ export default function CheckoutForm() {
   const router   = useRouter();
   const items    = useAppSelector(selectCartItems);
 
-  const [payMethod, setPayMethod] = useState("card");
-  const [loading,   setLoading]   = useState(false);
-  const [errors,    setErrors]    = useState<Record<string, string>>({});
+  const [pay,     setPay]    = useState("card");
+  const [loading, setLoading]= useState(false);
+  const [errors,  setErrors] = useState<Record<string,string>>({});
   const [form, setForm] = useState({
     firstName:"", lastName:"", email:"", phone:"",
     address:"", city:"", state:"Gujarat", pin:"", country:"India",
@@ -27,162 +26,162 @@ export default function CheckoutForm() {
   });
 
   function set(key: string, val: string) {
-    setForm((f) => ({ ...f, [key]: val }));
-    setErrors((e) => ({ ...e, [key]: "" }));
+    setForm((f)=>({ ...f, [key]:val })); setErrors((e)=>({ ...e, [key]:"" }));
   }
 
   function validate() {
-    const e: Record<string, string> = {};
-    if (!form.firstName) e.firstName = "Required";
-    if (!form.lastName)  e.lastName  = "Required";
-    if (!form.email.includes("@")) e.email = "Valid email required";
-    if (form.phone.length < 10)    e.phone = "Valid phone required";
-    if (!form.address) e.address = "Required";
-    if (!form.city)    e.city    = "Required";
-    if (form.pin.length < 5) e.pin = "Valid PIN required";
-    if (payMethod === "card") {
-      if (form.cardNumber.replace(/\s/g,"").length < 16) e.cardNumber = "Valid 16-digit card required";
-      if (!form.cardExpiry) e.cardExpiry = "Required";
-      if (form.cardCvv.length < 3) e.cardCvv = "3-digit CVV required";
-      if (!form.cardName)   e.cardName   = "Required";
+    const e: Record<string,string> = {};
+    if (!form.firstName) e.firstName="Required";
+    if (!form.lastName)  e.lastName="Required";
+    if (!form.email.includes("@")) e.email="Valid email required";
+    if (form.phone.length<10) e.phone="Valid phone required";
+    if (!form.address) e.address="Required";
+    if (!form.city)    e.city="Required";
+    if (form.pin.length<5) e.pin="Valid PIN required";
+    if (pay==="card") {
+      if (form.cardNumber.replace(/\s/g,"").length<16) e.cardNumber="16-digit card required";
+      if (!form.cardExpiry) e.cardExpiry="Required";
+      if (form.cardCvv.length<3) e.cardCvv="3-digit CVV required";
+      if (!form.cardName) e.cardName="Required";
     }
-    setErrors(e);
-    return Object.keys(e).length === 0;
+    setErrors(e); return Object.keys(e).length===0;
   }
 
-  async function handlePlaceOrder() {
+  async function handlePlace() {
     if (!validate()) return;
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 1200));
+    await new Promise((r)=>setTimeout(r,1200));
     dispatch(clearCart());
     router.push("/confirmation");
   }
 
-  const inp = (key: string) =>
-    `w-full px-4 py-3 rounded-[9px] border bg-[#0f1117] text-sm outline-none transition-colors focus:border-[#c9a84c] ${errors[key] ? "border-[#f87171]" : "border-[#252b3d]"}`;
+  const iCls = (k: string) =>
+    `w-full px-4 py-3 rounded-lg border text-sm outline-none transition-colors focus:border-[#6366f1] bg-[#f8fafc] text-[#1e293b] ${errors[k]?"border-[#ef4444]":"border-[#e2e8f0]"}`;
+
+  const Label = ({ children }: { children: React.ReactNode }) => (
+    <label className="block text-xs font-semibold mb-1.5 text-[#64748b] tracking-wide">{children}</label>
+  );
 
   return (
     <div className="flex flex-col gap-5">
       {/* Shipping */}
-      <section className="rounded-2xl border border-[#1e2232] bg-[#13161f] p-6">
-        <h3 className="text-sm font-bold mb-5 flex items-center gap-2" style={{ color:"#eef0f6" }}>
-          <span style={{ color:"#c9a84c" }}>📍</span> Shipping Address
+      <div className="bg-white rounded-xl border border-[#e2e8f0] p-6 shadow-sm">
+        <h3 className="text-sm font-bold text-[#1e293b] mb-5 flex items-center gap-2">
+          <span className="w-6 h-6 rounded-full bg-[#6366f1] text-white text-xs flex items-center justify-center font-bold">1</span>
+          Shipping Address
         </h3>
         <div className="grid grid-cols-2 gap-4">
           {[
-            { key:"firstName", label:"First Name",   placeholder:"Aryan",                   span:1 },
-            { key:"lastName",  label:"Last Name",    placeholder:"Kapoor",                  span:1 },
-            { key:"email",     label:"Email",        placeholder:"aryan@email.com",          span:2, type:"email" },
-            { key:"phone",     label:"Phone",        placeholder:"+91 98765 43210",          span:2, type:"tel"   },
-            { key:"address",   label:"Street Address",placeholder:"Flat 4B, MG Road",       span:2 },
-            { key:"city",      label:"City",         placeholder:"Ahmedabad",               span:1 },
-            { key:"pin",       label:"PIN Code",     placeholder:"380001",                  span:1 },
-          ].map((f) => (
-            <div key={f.key} className={f.span===2 ? "col-span-2" : ""}>
-              <label className="block text-xs font-semibold mb-1.5" style={{ color:"#6b7290" }}>{f.label}</label>
-              <input type={f.type||"text"} placeholder={f.placeholder}
+            { key:"firstName", label:"First Name",    ph:"Aryan",               span:1 },
+            { key:"lastName",  label:"Last Name",     ph:"Kapoor",              span:1 },
+            { key:"email",     label:"Email Address", ph:"aryan@email.com",     span:2, type:"email" },
+            { key:"phone",     label:"Phone Number",  ph:"+91 98765 43210",     span:2, type:"tel" },
+            { key:"address",   label:"Street Address",ph:"Flat 4B, MG Road",   span:2 },
+            { key:"city",      label:"City",          ph:"Ahmedabad",           span:1 },
+            { key:"pin",       label:"PIN Code",      ph:"380001",              span:1 },
+          ].map((f)=>(
+            <div key={f.key} className={f.span===2?"col-span-2":""}>
+              <Label>{f.label}</Label>
+              <input type={f.type||"text"} placeholder={f.ph}
                 value={(form as Record<string,string>)[f.key]}
-                onChange={(e) => set(f.key, e.target.value)}
-                className={inp(f.key)} style={{ color:"#eef0f6", fontFamily:"inherit" }}/>
-              {errors[f.key] && <p className="text-[11px] mt-1" style={{ color:"#f87171" }}>{errors[f.key]}</p>}
+                onChange={(e)=>set(f.key,e.target.value)}
+                className={iCls(f.key)} style={{ fontFamily:"inherit" }}/>
+              {errors[f.key] && <p className="text-[11px] mt-1 text-[#ef4444]">{errors[f.key]}</p>}
             </div>
           ))}
           <div>
-            <label className="block text-xs font-semibold mb-1.5" style={{ color:"#6b7290" }}>State</label>
-            <select value={form.state} onChange={(e) => set("state", e.target.value)}
-              className={inp("state")} style={{ color:"#eef0f6", fontFamily:"inherit" }}>
-              {["Gujarat","Maharashtra","Delhi","Karnataka","Tamil Nadu","Rajasthan","UP"].map((s) => <option key={s}>{s}</option>)}
+            <Label>State</Label>
+            <select value={form.state} onChange={(e)=>set("state",e.target.value)}
+              className={iCls("state")} style={{ fontFamily:"inherit" }}>
+              {["Gujarat","Maharashtra","Delhi","Karnataka","Tamil Nadu","Rajasthan","UP"].map((s)=><option key={s}>{s}</option>)}
             </select>
           </div>
           <div>
-            <label className="block text-xs font-semibold mb-1.5" style={{ color:"#6b7290" }}>Country</label>
-            <select value={form.country} onChange={(e) => set("country", e.target.value)}
-              className={inp("country")} style={{ color:"#eef0f6", fontFamily:"inherit" }}>
-              {["India","USA","UK","UAE","Singapore"].map((c) => <option key={c}>{c}</option>)}
+            <Label>Country</Label>
+            <select value={form.country} onChange={(e)=>set("country",e.target.value)}
+              className={iCls("country")} style={{ fontFamily:"inherit" }}>
+              {["India","USA","UK","UAE","Singapore"].map((c)=><option key={c}>{c}</option>)}
             </select>
           </div>
         </div>
-      </section>
+      </div>
 
       {/* Payment */}
-      <section className="rounded-2xl border border-[#1e2232] bg-[#13161f] p-6">
-        <h3 className="text-sm font-bold mb-5 flex items-center gap-2" style={{ color:"#eef0f6" }}>
-          <span style={{ color:"#c9a84c" }}>💳</span> Payment Method
+      <div className="bg-white rounded-xl border border-[#e2e8f0] p-6 shadow-sm">
+        <h3 className="text-sm font-bold text-[#1e293b] mb-5 flex items-center gap-2">
+          <span className="w-6 h-6 rounded-full bg-[#6366f1] text-white text-xs flex items-center justify-center font-bold">2</span>
+          Payment Method
         </h3>
         <div className="grid grid-cols-4 gap-2.5 mb-5">
-          {PAY_METHODS.map((m) => (
-            <button key={m.id} onClick={() => setPayMethod(m.id)}
-              className="py-3 rounded-xl border-2 flex flex-col items-center gap-1.5 transition-all duration-200"
-              style={ payMethod===m.id
-                ? { borderColor:"#c9a84c", background:"rgba(201,168,76,0.1)" }
-                : { borderColor:"#252b3d", background:"#0f1117" }}>
+          {PAY.map((m)=>(
+            <button key={m.id} onClick={()=>setPay(m.id)}
+              className="py-3 rounded-xl border-2 flex flex-col items-center gap-1.5 transition-all"
+              style={ pay===m.id
+                ? { borderColor:"#6366f1", background:"#eef2ff" }
+                : { borderColor:"#e2e8f0", background:"#f8fafc" }}>
               <span className="text-xl">{m.icon}</span>
-              <span className="text-[11px] font-bold" style={{ color:payMethod===m.id?"#e8c97a":"#8e96b5" }}>{m.label}</span>
+              <span className="text-[11px] font-bold" style={{ color:pay===m.id?"#6366f1":"#64748b" }}>{m.label}</span>
             </button>
           ))}
         </div>
 
-        {payMethod === "card" && (
+        {pay==="card" && (
           <div className="grid grid-cols-2 gap-4">
             <div className="col-span-2">
-              <label className="block text-xs font-semibold mb-1.5" style={{ color:"#6b7290" }}>Card Number</label>
-              <input placeholder="4242  4242  4242  4242" maxLength={19}
-                value={form.cardNumber}
-                onChange={(e) => {
-                  const v = e.target.value.replace(/\D/g,"").slice(0,16);
-                  set("cardNumber", v.replace(/(.{4})/g,"$1 ").trim());
-                }}
-                className={inp("cardNumber")} style={{ color:"#eef0f6", fontFamily:"inherit" }}/>
-              {errors.cardNumber && <p className="text-[11px] mt-1" style={{ color:"#f87171" }}>{errors.cardNumber}</p>}
+              <Label>Card Number</Label>
+              <input placeholder="4242  4242  4242  4242" maxLength={19} value={form.cardNumber}
+                onChange={(e)=>{ const v=e.target.value.replace(/\D/g,"").slice(0,16); set("cardNumber",v.replace(/(.{4})/g,"$1 ").trim()); }}
+                className={iCls("cardNumber")} style={{ fontFamily:"inherit" }}/>
+              {errors.cardNumber && <p className="text-[11px] mt-1 text-[#ef4444]">{errors.cardNumber}</p>}
             </div>
             <div>
-              <label className="block text-xs font-semibold mb-1.5" style={{ color:"#6b7290" }}>Expiry</label>
+              <Label>Expiry</Label>
               <input placeholder="MM / YY" maxLength={7} value={form.cardExpiry}
-                onChange={(e) => {
-                  const v = e.target.value.replace(/\D/g,"").slice(0,4);
-                  set("cardExpiry", v.length > 2 ? v.slice(0,2)+" / "+v.slice(2) : v);
-                }}
-                className={inp("cardExpiry")} style={{ color:"#eef0f6", fontFamily:"inherit" }}/>
-              {errors.cardExpiry && <p className="text-[11px] mt-1" style={{ color:"#f87171" }}>{errors.cardExpiry}</p>}
+                onChange={(e)=>{ const v=e.target.value.replace(/\D/g,"").slice(0,4); set("cardExpiry",v.length>2?v.slice(0,2)+" / "+v.slice(2):v); }}
+                className={iCls("cardExpiry")} style={{ fontFamily:"inherit" }}/>
+              {errors.cardExpiry && <p className="text-[11px] mt-1 text-[#ef4444]">{errors.cardExpiry}</p>}
             </div>
             <div>
-              <label className="block text-xs font-semibold mb-1.5" style={{ color:"#6b7290" }}>CVV</label>
+              <Label>CVV</Label>
               <input placeholder="•••" maxLength={3} type="password" value={form.cardCvv}
-                onChange={(e) => set("cardCvv", e.target.value.replace(/\D/g,"").slice(0,3))}
-                className={inp("cardCvv")} style={{ color:"#eef0f6", fontFamily:"inherit" }}/>
-              {errors.cardCvv && <p className="text-[11px] mt-1" style={{ color:"#f87171" }}>{errors.cardCvv}</p>}
+                onChange={(e)=>set("cardCvv",e.target.value.replace(/\D/g,"").slice(0,3))}
+                className={iCls("cardCvv")} style={{ fontFamily:"inherit" }}/>
+              {errors.cardCvv && <p className="text-[11px] mt-1 text-[#ef4444]">{errors.cardCvv}</p>}
             </div>
             <div className="col-span-2">
-              <label className="block text-xs font-semibold mb-1.5" style={{ color:"#6b7290" }}>Name on Card</label>
+              <Label>Name on Card</Label>
               <input placeholder="Aryan Kapoor" value={form.cardName}
-                onChange={(e) => set("cardName", e.target.value)}
-                className={inp("cardName")} style={{ color:"#eef0f6", fontFamily:"inherit" }}/>
-              {errors.cardName && <p className="text-[11px] mt-1" style={{ color:"#f87171" }}>{errors.cardName}</p>}
+                onChange={(e)=>set("cardName",e.target.value)}
+                className={iCls("cardName")} style={{ fontFamily:"inherit" }}/>
+              {errors.cardName && <p className="text-[11px] mt-1 text-[#ef4444]">{errors.cardName}</p>}
             </div>
           </div>
         )}
-        {payMethod === "upi" && (
+        {pay==="upi" && (
           <div>
-            <label className="block text-xs font-semibold mb-1.5" style={{ color:"#6b7290" }}>UPI ID</label>
-            <input placeholder="yourname@upi" className={inp("upi")} style={{ color:"#eef0f6", fontFamily:"inherit" }}/>
+            <Label>UPI ID</Label>
+            <input placeholder="yourname@upi" className={iCls("upi")} style={{ fontFamily:"inherit" }}/>
           </div>
         )}
-        {payMethod === "cod" && (
-          <p className="text-sm py-3 px-4 rounded-xl border border-[#252b3d]" style={{ color:"#8e96b5", background:"#0f1117" }}>
+        {pay==="cod" && (
+          <p className="text-sm py-3 px-4 rounded-xl border border-[#e2e8f0] bg-[#fffbeb] text-[#64748b]">
             Pay in cash when your order is delivered. ₹40 COD charge applies.
           </p>
         )}
-        {payMethod === "netbanking" && (
+        {pay==="netbanking" && (
           <div>
-            <label className="block text-xs font-semibold mb-1.5" style={{ color:"#6b7290" }}>Select Bank</label>
-            <select className={inp("bank")} style={{ color:"#eef0f6", fontFamily:"inherit" }}>
-              {["SBI","HDFC","ICICI","Axis","Kotak","Yes Bank"].map((b) => <option key={b}>{b}</option>)}
+            <Label>Select Bank</Label>
+            <select className={iCls("bank")} style={{ fontFamily:"inherit" }}>
+              {["SBI","HDFC","ICICI","Axis","Kotak","Yes Bank"].map((b)=><option key={b}>{b}</option>)}
             </select>
           </div>
         )}
-      </section>
+      </div>
 
-      <GoldBtn onClick={handlePlaceOrder} disabled={loading || items.length === 0} fullWidth>
+      {/* Place order */}
+      <button onClick={handlePlace} disabled={loading||items.length===0}
+        className="w-full py-4 rounded-xl text-sm font-bold text-white bg-[#6366f1] hover:bg-[#4f46e5] disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm hover:shadow-md flex items-center justify-center gap-2"
+        style={{ fontFamily:"inherit" }}>
         {loading ? (
           <>
             <svg className="animate-spin" width="16" height="16" fill="none" viewBox="0 0 24 24">
@@ -191,8 +190,15 @@ export default function CheckoutForm() {
             </svg>
             Processing…
           </>
-        ) : <>🔒 Place Order</>}
-      </GoldBtn>
+        ) : (
+          <>
+            <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+              <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+            </svg>
+            Place Order
+          </>
+        )}
+      </button>
     </div>
   );
 }

@@ -1,64 +1,52 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;0,900;1,500&family=Outfit:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@600;700;800&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --bg: #080a0e;
-  --surface: #0f1117;
-  --card: #13161f;
-  --border: #1e2232;
-  --border2: #252b3d;
-  --gold: #c9a84c;
-  --gold2: #e8c97a;
-  --gold-glow: rgba(201, 168, 76, 0.18);
-  --text: #eef0f6;
-  --muted: #6b7290;
-  --muted2: #8e96b5;
-  --green: #34d399;
-  --red: #f87171;
+  /* CMS Template color system */
+  --bg:        #f1f5f9;
+  --surface:   #ffffff;
+  --card:      #ffffff;
+  --border:    #e2e8f0;
+  --border2:   #cbd5e1;
+  --sidebar:   #1e293b;
+  --sidebar2:  #0f172a;
+
+  /* Accents */
+  --primary:   #6366f1;
+  --primary2:  #818cf8;
+  --primary-bg:#eef2ff;
+  --primary-glow: rgba(99,102,241,0.15);
+
+  --gold:      #f59e0b;
+  --gold2:     #fbbf24;
+  --green:     #10b981;
+  --red:       #ef4444;
+  --orange:    #f97316;
+
+  /* Text */
+  --text:      #0f172a;
+  --text2:     #334155;
+  --muted:     #64748b;
+  --muted2:    #94a3b8;
 }
 
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-html,
-body {
+html, body {
   min-height: 100%;
-  font-family: 'Outfit', sans-serif;
+  font-family: 'Inter', sans-serif;
   background: var(--bg);
   color: var(--text);
   overflow-x: hidden;
 }
 
-/* Scrollbar */
-::-webkit-scrollbar {
-  width: 4px;
-}
-::-webkit-scrollbar-thumb {
-  background: var(--border2);
-  border-radius: 4px;
-}
-
-/* Noise texture overlay */
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
-  pointer-events: none;
-  z-index: 9999;
-  opacity: 0.4;
-}
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
 
 @layer utilities {
-  .font-playfair {
-    font-family: 'Playfair Display', serif;
-  }
-  .font-outfit {
-    font-family: 'Outfit', sans-serif;
-  }
+  .font-poppins { font-family: 'Poppins', sans-serif; }
+  .font-inter   { font-family: 'Inter', sans-serif; }
 }

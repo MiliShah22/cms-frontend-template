@@ -6,130 +6,127 @@ import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { selectUser, selectIsLoggedIn, logout } from "@/store/slices/authSlice";
 import { selectCartItems, selectCartTotal } from "@/store/slices/cartSlice";
 import { selectWishlistIds } from "@/store/slices/wishlistSlice";
-import { GhostBtn } from "@/components/ui/Buttons";
 
-const ORDER_HISTORY = [
+const ORDERS = [
   { id:"LUXE-2026-84201", date:"Mar 10, 2026", items:3, total:48890, status:"Delivered" },
   { id:"LUXE-2026-71038", date:"Feb 22, 2026", items:1, total:12995, status:"Delivered" },
   { id:"LUXE-2026-59314", date:"Jan 15, 2026", items:2, total:37489, status:"Delivered" },
 ];
 
 export default function AccountPage() {
-  const router     = useRouter();
-  const dispatch   = useAppDispatch();
-  const user       = useAppSelector(selectUser);
-  const isLoggedIn = useAppSelector(selectIsLoggedIn);
-  const cartItems  = useAppSelector(selectCartItems);
-  const cartTotal  = useAppSelector(selectCartTotal);
-  const wishIds    = useAppSelector(selectWishlistIds);
+  const router    = useRouter();
+  const dispatch  = useAppDispatch();
+  const user      = useAppSelector(selectUser);
+  const isLoggedIn= useAppSelector(selectIsLoggedIn);
+  const cartItems = useAppSelector(selectCartItems);
+  const cartTotal = useAppSelector(selectCartTotal);
+  const wishIds   = useAppSelector(selectWishlistIds);
 
-  useEffect(() => { if (!isLoggedIn) router.replace("/login"); }, [isLoggedIn, router]);
-  if (!isLoggedIn || !user) return null;
+  useEffect(()=>{ if(!isLoggedIn) router.replace("/login"); },[isLoggedIn,router]);
+  if (!isLoggedIn||!user) return null;
 
-  const cartQty = cartItems.reduce((s, i) => s + i.qty, 0);
+  const cartQty = cartItems.reduce((s,i)=>s+i.qty,0);
+  const totalSpent = ORDERS.reduce((s,o)=>s+o.total,0);
 
-  const statCards = [
-    { label:"Orders",      value: ORDER_HISTORY.length,                                          icon:"📦", color:"#c9a84c" },
-    { label:"Wishlist",    value: wishIds.length,                                                icon:"❤️",  color:"#f87171" },
-    { label:"Cart Items",  value: cartQty,                                                       icon:"🛍️", color:"#34d399" },
-    { label:"Total Spent", value:`₹${ORDER_HISTORY.reduce((s,o)=>s+o.total,0).toLocaleString()}`,icon:"💰", color:"#e8c97a" },
+  const stats = [
+    { label:"Total Orders",  value:ORDERS.length,                icon:"📦", bg:"#eef2ff", color:"#6366f1" },
+    { label:"Wishlist",      value:wishIds.length,               icon:"❤️",  bg:"#fef2f2", color:"#ef4444" },
+    { label:"Cart Items",    value:cartQty,                      icon:"🛍️", bg:"#f0fdf4", color:"#10b981" },
+    { label:"Total Spent",   value:`₹${totalSpent.toLocaleString()}`,icon:"💰",bg:"#fffbeb",color:"#f59e0b" },
   ];
 
   return (
-    <div className="max-w-[1100px] mx-auto px-6 md:px-10 py-10 pb-16">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-10 flex-wrap gap-4">
-        <div className="flex items-center gap-5">
-          <div className="w-16 h-16 rounded-full flex items-center justify-center text-2xl font-black"
-            style={{ background:"linear-gradient(135deg,#c9a84c,#e8c97a)", color:"#080a0e" }}>
+    <div className="max-w-[1100px] mx-auto px-6 md:px-10 py-8 pb-16">
+      {/* Profile header */}
+      <div className="bg-white rounded-2xl border border-[#e2e8f0] shadow-sm p-6 mb-6 flex items-center justify-between flex-wrap gap-4">
+        <div className="flex items-center gap-4">
+          <div className="w-14 h-14 rounded-full flex items-center justify-center text-xl font-black bg-[#6366f1] text-white">
             {user.name[0]}
           </div>
           <div>
-            <h1 className="font-playfair text-2xl font-bold" style={{ color:"#eef0f6" }}>{user.name}</h1>
-            <p className="text-sm mt-0.5" style={{ color:"#8e96b5" }}>{user.email}</p>
-            <span className="text-xs font-bold px-2.5 py-1 rounded-full mt-1 inline-block"
-              style={{ background:"rgba(201,168,76,0.15)", color:"#c9a84c" }}>{user.role}</span>
+            <h1 className="font-poppins text-xl font-bold text-[#0f172a]">{user.name}</h1>
+            <p className="text-sm text-[#64748b]">{user.email}</p>
+            <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-[#eef2ff] text-[#6366f1] mt-1 inline-block">{user.role}</span>
           </div>
         </div>
-        <GhostBtn danger onClick={() => { dispatch(logout()); router.push("/"); }}>🚪 Logout</GhostBtn>
+        <button onClick={()=>{ dispatch(logout()); router.push("/"); }}
+          className="flex items-center gap-2 px-4 py-2 rounded-lg border border-[#e2e8f0] text-sm font-medium text-[#ef4444] hover:border-[#ef4444] hover:bg-[#fef2f2] transition-all">
+          🚪 Logout
+        </button>
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
-        {statCards.map((s) => (
-          <div key={s.label} className="rounded-2xl border border-[#1e2232] bg-[#13161f] p-5">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        {stats.map((s)=>(
+          <div key={s.label} className="bg-white rounded-xl border border-[#e2e8f0] shadow-sm p-5" style={{ borderLeftWidth:4, borderLeftColor:s.color }}>
             <div className="text-2xl mb-2">{s.icon}</div>
-            <div className="font-playfair text-2xl font-black mb-1" style={{ color:s.color }}>{s.value}</div>
-            <div className="text-xs font-semibold" style={{ color:"#6b7290" }}>{s.label}</div>
+            <div className="font-poppins text-2xl font-black mb-0.5" style={{ color:s.color }}>{s.value}</div>
+            <div className="text-xs font-semibold text-[#64748b]">{s.label}</div>
           </div>
         ))}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-6">
-        {/* Order History */}
-        <div className="rounded-2xl border border-[#1e2232] bg-[#13161f] overflow-hidden">
-          <div className="flex items-center justify-between px-6 py-4 border-b border-[#1e2232]">
-            <h2 className="font-playfair text-lg font-bold" style={{ color:"#eef0f6" }}>Order History</h2>
-            <span className="text-xs" style={{ color:"#6b7290" }}>{ORDER_HISTORY.length} orders</span>
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-6">
+        {/* Order history */}
+        <div className="bg-white rounded-2xl border border-[#e2e8f0] shadow-sm overflow-hidden">
+          <div className="flex items-center justify-between px-6 py-4 border-b border-[#f1f5f9]">
+            <h2 className="font-poppins text-base font-bold text-[#0f172a]">Order History</h2>
+            <span className="text-xs text-[#94a3b8]">{ORDERS.length} orders</span>
           </div>
-          {ORDER_HISTORY.map((order, i) => (
-            <div key={order.id}
-              className={`flex items-center justify-between px-6 py-4 hover:bg-[#0f1117] transition-colors ${i < ORDER_HISTORY.length-1 ? "border-b border-[#1e2232]" : ""}`}>
+          {ORDERS.map((o,i)=>(
+            <div key={o.id}
+              className={`flex items-center justify-between px-6 py-4 hover:bg-[#f8fafc] transition-colors ${i<ORDERS.length-1?"border-b border-[#f1f5f9]":""}`}>
               <div>
-                <p className="text-sm font-semibold mb-0.5" style={{ color:"#eef0f6" }}>{order.id}</p>
-                <p className="text-xs" style={{ color:"#6b7290" }}>{order.date} · {order.items} item{order.items>1?"s":""}</p>
+                <p className="text-sm font-semibold text-[#1e293b]">{o.id}</p>
+                <p className="text-xs text-[#94a3b8] mt-0.5">{o.date} · {o.items} item{o.items>1?"s":""}</p>
               </div>
               <div className="text-right">
-                <p className="font-playfair text-base font-bold mb-1" style={{ color:"#e8c97a" }}>₹{order.total.toLocaleString()}</p>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full"
-                  style={{ background:"rgba(52,211,153,0.12)", color:"#34d399" }}>✓ {order.status}</span>
+                <p className="font-poppins text-sm font-bold text-[#1e293b]">₹{o.total.toLocaleString()}</p>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#f0fdf4] text-[#10b981] mt-1 inline-block">✓ {o.status}</span>
               </div>
             </div>
           ))}
         </div>
 
-        {/* Quick Links */}
+        {/* Quick links */}
         <div className="flex flex-col gap-3">
           {[
-            { href:"/wishlist",     icon:"❤️",  label:"My Wishlist",    sub:`${wishIds.length} items saved`                },
+            { href:"/wishlist",     icon:"❤️",  label:"My Wishlist",    sub:`${wishIds.length} saved`             },
             { href:"/cart",         icon:"🛍️",  label:"My Cart",        sub:`${cartQty} items · ₹${cartTotal.toLocaleString()}` },
-            { href:"/new-arrivals", icon:"🌟",  label:"New Arrivals",   sub:"See what just landed"                          },
-            { href:"/offers",       icon:"🏷️",  label:"Today's Offers", sub:"Up to 30% off sitewide"                        },
-            { href:"/collections",  icon:"✨",  label:"Collections",    sub:"Curated product sets"                          },
-          ].map((l) => (
+            { href:"/new-arrivals", icon:"🌟",  label:"New Arrivals",   sub:"See what just landed"                 },
+            { href:"/offers",       icon:"🏷️",  label:"Today's Offers", sub:"Up to 30% off"                       },
+            { href:"/collections",  icon:"✨",  label:"Collections",    sub:"Curated sets"                         },
+          ].map((l)=>(
             <Link key={l.href} href={l.href}
-              className="flex items-center gap-4 p-4 rounded-2xl border border-[#1e2232] bg-[#13161f] hover:border-[#252b3d] hover:-translate-y-0.5 transition-all group">
-              <span className="text-2xl">{l.icon}</span>
+              className="flex items-center gap-3 p-4 rounded-xl border border-[#e2e8f0] bg-white hover:border-[#6366f1] hover:bg-[#eef2ff] transition-all group shadow-sm">
+              <span className="text-xl">{l.icon}</span>
               <div className="flex-1">
-                <p className="text-sm font-semibold group-hover:text-[#c9a84c] transition-colors" style={{ color:"#eef0f6" }}>{l.label}</p>
-                <p className="text-xs mt-0.5" style={{ color:"#6b7290" }}>{l.sub}</p>
+                <p className="text-sm font-semibold text-[#1e293b] group-hover:text-[#6366f1] transition-colors">{l.label}</p>
+                <p className="text-xs text-[#94a3b8]">{l.sub}</p>
               </div>
-              <svg width="14" height="14" fill="none" stroke="#252b3d" strokeWidth="2" viewBox="0 0 24 24"
-                className="group-hover:stroke-[#c9a84c] transition-colors flex-shrink-0">
+              <svg width="14" height="14" fill="none" stroke="#cbd5e1" strokeWidth="2" viewBox="0 0 24 24" className="group-hover:stroke-[#6366f1] transition-colors">
                 <polyline points="9 18 15 12 9 6"/>
               </svg>
             </Link>
           ))}
-        </div>
-      </div>
 
-      {/* Profile Info */}
-      <div className="mt-6 rounded-2xl border border-[#1e2232] bg-[#13161f] p-6">
-        <h3 className="font-playfair text-lg font-bold mb-5" style={{ color:"#eef0f6" }}>Profile Information</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          {[
-            { label:"Full Name",    value:user.name              },
-            { label:"Email",        value:user.email             },
-            { label:"Role",         value:user.role              },
-            { label:"Member Since", value:"January 2026"         },
-            { label:"Phone",        value:"+91 98765 43210"      },
-            { label:"Location",     value:"Ahmedabad, Gujarat"   },
-          ].map((f) => (
-            <div key={f.label}>
-              <p className="text-xs font-bold tracking-wider uppercase mb-1" style={{ color:"#6b7290" }}>{f.label}</p>
-              <p className="text-sm font-medium" style={{ color:"#eef0f6" }}>{f.value}</p>
+          {/* Profile info */}
+          <div className="bg-white rounded-xl border border-[#e2e8f0] shadow-sm p-5 mt-1">
+            <h3 className="font-poppins text-sm font-bold text-[#0f172a] mb-4">Profile Information</h3>
+            <div className="grid grid-cols-2 gap-3">
+              {[
+                { label:"Name",    val:user.name              },
+                { label:"Role",    val:user.role              },
+                { label:"Email",   val:user.email             },
+                { label:"Since",   val:"January 2026"         },
+              ].map((f)=>(
+                <div key={f.label}>
+                  <p className="text-[10px] font-bold text-[#94a3b8] uppercase tracking-wider mb-0.5">{f.label}</p>
+                  <p className="text-xs font-medium text-[#1e293b] truncate">{f.val}</p>
+                </div>
+              ))}
             </div>
-          ))}
+          </div>
         </div>
       </div>
     </div>

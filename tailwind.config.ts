@@ -9,32 +9,27 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
-        playfair: ["var(--font-playfair)", "serif"],
-        outfit: ["var(--font-outfit)", "sans-serif"],
+        poppins: ["Poppins", "sans-serif"],
+        inter:   ["Inter",   "sans-serif"],
       },
       colors: {
-        bg: "#080a0e",
-        surface: "#0f1117",
-        card: "#13161f",
-        border: "#1e2232",
-        border2: "#252b3d",
-        gold: "#c9a84c",
-        gold2: "#e8c97a",
-        muted: "#6b7290",
-        muted2: "#8e96b5",
-        emerald: "#34d399",
-        rose: "#f87171",
-      },
-      backgroundImage: {
-        "gold-gradient": "linear-gradient(135deg, #c9a84c, #e8c97a)",
-      },
-      boxShadow: {
-        gold: "0 8px 30px rgba(201,168,76,0.18)",
-        card: "0 20px 50px rgba(0,0,0,0.5)",
+        bg:       "#f1f5f9",
+        surface:  "#ffffff",
+        card:     "#ffffff",
+        border:   "#e2e8f0",
+        border2:  "#cbd5e1",
+        sidebar:  "#1e293b",
+        primary:  "#6366f1",
+        primary2: "#818cf8",
+        gold:     "#f59e0b",
+        emerald:  "#10b981",
+        rose:     "#ef4444",
+        muted:    "#64748b",
+        muted2:   "#94a3b8",
+        text2:    "#334155",
       },
     },
   },
   plugins: [],
 };
-
 export default config;
