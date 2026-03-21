@@ -1,7 +1,11 @@
-# Register Page Fix TODO
+t # Fix Git CRLF Warnings
 
-## Done:
-- [x] Step 1: Update store/slices/authSlice.ts with loading states and async register thunk
-- [x] Step 2: Update app/register/page.tsx with loading, success handling, improved validation
-- [x] Step 3: Test registration flow (verified via updates and dev server started)
+## Steps:
+- [x] Step 1: Create TODO.md (tracking)
+- [x] Step 2: Normalize line endings for app/api/stripe/route.ts to LF
+- [x] Step 3: Normalize line endings for hooks/useDebounce.ts to LF
+- [x] Step 4: Normalize line endings for hooks/useStripe.ts to LF
+- [ ] Step 5: Check git status to confirm warnings gone
+- [ ] Step 6: Update TODO.md with completion
+- [ ] Step 7: Attempt task completion
 
