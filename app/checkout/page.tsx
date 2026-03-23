@@ -16,18 +16,8 @@ export default function CheckoutPage() {
 
   useEffect(() => {
     if (items.length === 0) router.replace("/cart");
-    if (!isLoggedIn) router.replace("/login");
-  }, [items, isLoggedIn, router]);
+  }, [items, router]);
   if (items.length === 0) return null;
-  if (!isLoggedIn) return (
-    <div className="max-w-md mx-auto px-6 py-20 text-center">
-      <div className="text-5xl mb-5">🔐</div>
-      <h2 className="font-poppins text-2xl font-bold text-[#1e293b] mb-3">Please login to checkout</h2>
-      <Link href="/login" className="inline-block px-6 py-3 rounded-lg bg-[#6366f1] hover:bg-[#4f46e5] text-white font-semibold transition-all">
-        Go to Login
-      </Link>
-    </div>
-  );
 
   return (
     <div className="max-w-[1100px] mx-auto px-6 md:px-10 py-8 pb-16">
@@ -41,6 +31,13 @@ export default function CheckoutPage() {
         </Link>
         <h1 className="font-poppins text-3xl font-bold text-[#0f172a]">Checkout</h1>
         <p className="text-sm text-[#64748b] mt-1">Complete your purchase securely</p>
+        {!isLoggedIn && (
+          <div className="mt-4 p-4 rounded-xl bg-amber-50 border border-amber-200">
+            <p className="text-sm text-amber-800">
+              👋 Guest checkout enabled! <Link href="/login" className="font-semibold underline hover:no-underline">Login for faster checkout & order tracking</Link>
+            </p>
+          </div>
+        )}
         <div className="mt-3 h-1 w-16 rounded-full bg-[#6366f1]" />
       </div>
 
@@ -53,12 +50,12 @@ export default function CheckoutPage() {
         ].map((s, i) => (
           <div key={s.n} className="flex items-center gap-2">
             <div className="flex items-center gap-2">
-              <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold ${s.done ? "bg-[#10b981] text-white" : s.active ? "bg-[#6366f1] text-white" : "bg-[#e2e8f0] text-[#94a3b8]"}`}>
+              <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold ${s.done ? "bg-emerald-500 text-white" : s.active ? "bg-primary text-white" : "bg-border text-muted2"}`}>
                 {s.done ? "✓" : s.n}
               </div>
-              <span className={`text-xs font-semibold hidden sm:block ${s.active ? "text-[#6366f1]" : s.done ? "text-[#10b981]" : "text-[#94a3b8]"}`}>{s.label}</span>
+              <span className={`text-xs font-semibold hidden sm:block ${s.active ? "text-primary" : s.done ? "text-emerald-500" : "text-muted2"}`}>{s.label}</span>
             </div>
-            {i < 2 && <div className="w-10 h-px bg-[#e2e8f0]" />}
+            {i < 2 && <div className="w-10 h-px bg-border" />}
           </div>
         ))}
       </div>
@@ -67,8 +64,8 @@ export default function CheckoutPage() {
         <CheckoutForm stripePromise={getStripe()} />
 
         {/* Mini summary */}
-        <div className="bg-white rounded-xl border border-[#e2e8f0] p-6 shadow-sm sticky top-20">
-          <h3 className="font-poppins text-base font-bold text-[#0f172a] mb-5">Order Summary</h3>
+        <div className="bg-surface rounded-xl border border-border p-6 shadow-sm sticky top-20">
+          <h3 className="font-poppins text-base font-bold text-sidebar mb-5">Order Summary</h3>
           <div className="flex flex-col gap-3 mb-5">
             {items.map((item) => (
               <div key={item.id} className="flex items-center gap-3 pb-3 border-b border-[#f1f5f9]">
@@ -87,11 +84,11 @@ export default function CheckoutPage() {
           </div>
           <div className="flex justify-between items-baseline">
             <span className="text-sm font-bold text-[#0f172a]">Total</span>
-            <span className="font-poppins text-xl font-black text-[#6366f1]">₹{total.toLocaleString()}</span>
+            <span className="font-poppins text-xl font-black text-primary">₹{total.toLocaleString()}</span>
           </div>
           <div className="flex justify-center gap-5 mt-5 pt-4 border-t border-[#f1f5f9]">
             {[{ icon: "🔒", label: "SSL Secured" }, { icon: "↩️", label: "Easy Returns" }].map((b) => (
-              <div key={b.label} className="flex items-center gap-1 text-[10px] text-[#94a3b8]">
+              <div key={b.label} className="flex items-center gap-1 text-[10px] text-muted2">
                 <span>{b.icon}</span>{b.label}
               </div>
             ))}
@@ -100,4 +97,6 @@ export default function CheckoutPage() {
       </div>
     </div>
   );
+}
+
 }

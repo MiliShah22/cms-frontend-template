@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { useAppSelector, useAppDispatch } from "@/store/hooks";
 import { selectCartItems, clearCart } from "@/store/slices/cartSlice";
+import { selectIsLoggedIn } from "@/store/slices/authSlice";
 import CartItemRow from "@/components/cart/CartItemRow";
 import OrderSummary from "@/components/cart/OrderSummary";
 import { showToast } from "@/components/ui/Toast";
@@ -9,15 +10,21 @@ import { showToast } from "@/components/ui/Toast";
 export default function CartPage() {
   const dispatch = useAppDispatch();
   const items = useAppSelector(selectCartItems);
+  const isLoggedIn = useAppSelector(selectIsLoggedIn);
   const totalQty = items.reduce((s, i) => s + i.qty, 0);
 
   return (
     <div className="max-w-[1100px] mx-auto px-6 md:px-10 py-8 pb-16">
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="font-poppins text-3xl font-bold text-[#0f172a]">Shopping Cart</h1>
-          {totalQty > 0 && <p className="text-sm text-[#64748b] mt-1">{totalQty} item{totalQty > 1 ? "s" : ""} in your bag</p>}
-          <div className="mt-3 h-1 w-16 rounded-full bg-[#6366f1]" />
+          <h1 className="font-poppins text-3xl font-bold text-sidebar">Shopping Cart</h1>
+          {totalQty > 0 && <p className="text-sm text-muted mt-1">{totalQty} item{totalQty > 1 ? "s" : ""} in your bag</p>}
+          {!isLoggedIn && (
+            <p className="text-xs text-muted2 mt-2 px-3 py-1.5 bg-amber-50 rounded-full inline-flex items-center gap-1.5 border border-amber-200">
+              👋 Guest cart • <Link href="/login" className="font-semibold underline text-amber-800 hover:text-primary">Login to save</Link>
+            </p>
+          )}
+          <div className="mt-3 h-1 w-16 rounded-full bg-primary" />
         </div>
         <div className="flex items-center gap-3">
           {items.length > 0 && (

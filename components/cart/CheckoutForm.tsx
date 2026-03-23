@@ -92,6 +92,19 @@ function CheckoutFormInner() {
     if (error) {
       setErrors({ stripe: error.message || 'Payment failed' });
     } else if (paymentIntent?.status === 'succeeded') {
+      // Save guest order
+      const orderId = `guest_${Date.now()}`;
+      const orderData = {
+        id: orderId,
+        email: form.email,
+        items,
+        total,
+        timestamp: new Date().toISOString(),
+        status: 'confirmed',
+        address: `${form.address}, ${form.city}, ${form.state} ${form.pin}, ${form.country}`
+      };
+      localStorage.setItem(`guestOrder_${btoa(form.email).slice(0, 10)}`, JSON.stringify(orderData));
+
       dispatch(clearCart());
       router.push('/confirmation');
     }
@@ -109,8 +122,8 @@ function CheckoutFormInner() {
     <div className="flex flex-col gap-5">
       {/* Shipping */}
       <div className="bg-white rounded-xl border border-[#e2e8f0] p-6 shadow-sm">
-        <h3 className="text-sm font-bold text-[#1e293b] mb-5 flex items-center gap-2">
-          <span className="w-6 h-6 rounded-full bg-[#6366f1] text-white text-xs flex items-center justify-center font-bold">1</span>
+        <h3 className="text-sm font-bold text-sidebar mb-5 flex items-center gap-2">
+          <span className="w-6 h-6 rounded-full bg-primary text-white text-xs flex items-center justify-center font-bold">1</span>
           Shipping Address
         </h3>
         <form onSubmit={handleSubmit}>
