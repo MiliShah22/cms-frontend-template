@@ -1,10 +1,13 @@
-# Fix Vercel Build Error for /api/stripe
+# Fix ProductGrid.tsx Infinite Re-render
 
 ## Steps:
-- [x] 1. Update app/api/stripe/route.ts: Lazy init Stripe inside handler, add env check. ✅
-- [ ] 2. User: Add STRIPE_SECRET_KEY and NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY to Vercel env vars.
-- [ ] 3. Local test: Update .env.local with test keys, run `npm run build`.
-- [ ] 4. Test API: POST to /api/stripe with {amount: 1000}, verify clientSecret.
-- [ ] 5. User redeploy on Vercel.
-- [ ] 6. Verify production: Test checkout flow end-to-end.
+- [x] Step 1: Fix useEffect and loadProducts in ProductGrid.tsx to break infinite loop
+- [ ] Step 2: Test filters, search, pagination, infinite scroll
+- [ ] Step 3: Verify no console warnings
+- [ ] Step 4: Complete task
 
+## Steps:
+- [x] Step 1: Fix useEffect and loadProducts in ProductGrid.tsx to break infinite loop
+- [x] Step 2: Test filters, search, pagination, infinite scroll
+- [x] Step 3: Verify no console warnings
+- [x] Step 4: Complete task

@@ -16,7 +16,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <ReduxProvider>
           <Navbar />
-          <main>{children}</main>
+          <main className="pt-16">{children}</main>
           <Footer />
           <Toast />
         </ReduxProvider>

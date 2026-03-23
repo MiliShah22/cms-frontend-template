@@ -28,7 +28,7 @@ export default function Navbar() {
   const [dropdown, setDropdown] = useState(false);
 
   return (
-    <nav className="sticky top-0 z-50 h-16 flex items-center justify-between px-6 md:px-10 border-b border-[#e2e8f0] bg-white shadow-sm">
+    <nav className="w-full fixed top-0 z-50 h-16 flex items-center justify-between px-6 md:px-10 border-b border-[#e2e8f0] bg-white shadow-sm">
       {/* Logo */}
       <Link href="/" className="font-poppins text-xl font-bold tracking-tight text-[#6366f1]">
         LUXE
