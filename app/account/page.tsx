@@ -32,14 +32,19 @@ export default function AccountPage() {
   const [editMode, setEditMode] = useState(false);
   const [formData, setFormData] = useState({ name: "", phone: "", address: "" });
 
-  useEffect(() => { if (!isLoggedIn) router.replace("/login"); }, [isLoggedIn, router]);
-  if (!isLoggedIn || !user) return null;
-
   useEffect(() => {
-    if (user) {
-      setFormData({ name: user.name, phone: user.phone || "", address: user.address || "" });
+    if (!isLoggedIn) {
+      router.replace("/login");
+      return;
     }
-  }, [user]);
+    if (user) {
+      setFormData({ name: user.name || "", phone: user.phone || "", address: user.address || "" });
+    }
+  }, [isLoggedIn, user, router]);
+
+  if (!isLoggedIn) {
+    return <div>Loading...</div>; // Prevent flash while redirecting
+  }
 
   const cartQty = cartItems.reduce((s, i) => s + i.qty, 0);
   const totalSpent = ORDERS.reduce((s, o) => s + o.total, 0);
@@ -270,7 +275,7 @@ export default function AccountPage() {
               <div className="bg-white rounded-2xl border border-[#e2e8f0] shadow-sm p-12 text-center">
                 <span className="text-5xl block mb-4">❤️</span>
                 <h3 className="font-poppins text-lg font-bold text-[#0f172a] mb-2">Your wishlist is empty</h3>
-                <p className="text-sm text-[#64748b] mb-6">Save items you love for later</p>
+                <p className="text-sm text-[#94a3b8] mb-6">Save items you love for later</p>
                 <Link href="/" className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[#6366f1] hover:bg-[#4f46e5] text-white text-sm font-bold transition-all">
                   Start Shopping
                 </Link>

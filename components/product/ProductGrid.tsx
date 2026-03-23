@@ -20,7 +20,7 @@ export default function ProductGrid() {
   const sort = searchParams.get('sort') ?? 'popular';
   const search = searchParams.get('search') ?? '';
 
-  async function loadProducts(reset = false) {
+  const loadProducts = useCallback(async (reset = false) => {
     if (loading) return;
     setLoading(true);
     const p = reset ? 1 : page;
@@ -35,7 +35,7 @@ export default function ProductGrid() {
     setHasMore(res.total > p * 12);
     if (!reset) setPage(p + 1);
     setLoading(false);
-  }
+  }, [loading, page, search, cat, sort, products]);
 
   const lastProductRef = useCallback((node: HTMLDivElement | null) => {
     if (observer.current) observer.current.disconnect();
@@ -45,7 +45,7 @@ export default function ProductGrid() {
       }
     });
     if (node) observer.current?.observe(node);
-  }, [hasMore, loading]);
+  }, [hasMore, loading, loadProducts]);
 
   function updateParams(updates: Record<string, string | null>) {
     const newParams = new URLSearchParams(searchParams);
@@ -64,7 +64,7 @@ export default function ProductGrid() {
 
   useEffect(() => {
     loadProducts(true);
-  }, [search, cat, sort]);
+  }, [search, cat, sort, loadProducts]);
 
   return (
     <>

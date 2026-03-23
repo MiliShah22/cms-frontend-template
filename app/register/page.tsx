@@ -26,7 +26,7 @@ export default function RegisterPage() {
 
   const validateField = useCallback((key: string) => {
     validate();
-  }, [form]);
+  }, [form, validate]);
 
   function set(key: string, val: string) {
     setForm(f => ({ ...f, [key]: val }));

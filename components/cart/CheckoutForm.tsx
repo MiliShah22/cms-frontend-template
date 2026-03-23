@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { clearCart, selectCartItems, selectCartTotal } from "@/store/slices/cartSlice";
@@ -33,7 +33,7 @@ function CheckoutFormInner() {
     address: "", city: "", state: "Gujarat", pin: "", country: "India",
   });
 
-  async function createPaymentIntent() {
+  const createPaymentIntent = useCallback(async () => {
     const response = await fetch('/api/stripe', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -41,13 +41,13 @@ function CheckoutFormInner() {
     });
     const { clientSecret: secret } = await response.json();
     setClientSecret(secret);
-  }
+  }, [total]);
 
   useEffect(() => {
     if (pay === 'card') {
       createPaymentIntent();
     }
-  }, [pay, total]);
+  }, [pay, total, createPaymentIntent]);
 
   const set = (key: string, val: string) => {
     setForm((f) => ({ ...f, [key]: val }));
